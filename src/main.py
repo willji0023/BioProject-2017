@@ -1,3 +1,5 @@
+# game with repeating time limit that shouldn't be able to exit(so players don't 
+# close out of it and lose high scores) unless while the game is running
 import pygame, sys, random, time, easygui
 
 pygame.init()                                                            
@@ -12,6 +14,8 @@ DRONE_Y = 350
 GAMETIME = 25
 pygame.key.set_repeat(delay, interval)
 random.seed(a=None)
+
+# fonts
 plainfont = pygame.font.SysFont("monospace", 15)
 credit = plainfont.render("William Jin", 1, (0, 0, 0))
 boldfont = pygame.font.SysFont("bangers", 35)
@@ -27,6 +31,7 @@ dumbfont = pygame.font.SysFont("comicsans", 20)
 joke = dumbfont.render("(of Science)", 1, (0, 0, 0))
 easygui.msgbox("To play, move left and right with the arrow keys. Press spacebar to become stationary, but eject a shield to block incoming acid rain, earning points each drop. Catch the mega-acid drop to earn even more points. Rain speed can possibly become stronger or weaker. You have 16 seconds. Good luck!")
 
+# classes
 class Drone(pygame.sprite.Sprite):                                        
     def __init__(self, image_file, speed, location):                      
         pygame.sprite.Sprite.__init__(self)     
@@ -80,7 +85,7 @@ def animate(group, shield):
                 acidrain.rect.left = random.randint(0, 1600)
                 acidrain.rect.top = 0
         
-
+# window for players to leave the game where it is or restart, or for a new player to begin
 def gameover(self):
     keep_going = False
     while not keep_going:
@@ -88,7 +93,8 @@ def gameover(self):
             keep_going = True
         else:
             easygui.msgbox("To play, move left and right with the arrow keys. Press spacebar to become stationary, but eject a shield to block incoming acid rain, earning points each drop. Catch the mega-acid drop to earn even more points. Rain speed can possibly become stronger or weaker. You have 16 seconds. Good luck!")
-            
+
+# adding multiple acid drops plus one mega acid           
 group = pygame.sprite.Group()
 megarain = Acid('megarain.png')
 group.add(megarain)
@@ -103,8 +109,12 @@ caught = False
 spaceRemembered = spacePresses
 highscore = 7
 highscoreman = "God"
+
+# main while loop
 while running:
     screen.blit(background, (0, 0))
+
+    # runs every start to ask for player's name
     while startup:
         name = easygui.enterbox("Hello and welcome. What's your name?")
         if name is None:
@@ -113,10 +123,15 @@ while running:
         else:
             start_ticks = pygame.time.get_ticks()
             startup = False
+    
+    # highscores
     currentName = boldfont.render("Hello, "+name, 1, (255, 0, 255))
     currentScore = boldfont.render("Your Score = "+str(score), 1, (0, 0, 0))
     currentHighscore = SMfunnyfont.render(highscoreman+" - "+str(highscore), 1, (2, 83, 110))
+    
     animate(group, caught)
+
+    # time
     seconds = (pygame.time.get_ticks()-start_ticks)/1000
     timer = GAMETIME - seconds
     if timer <= 0:
@@ -138,6 +153,7 @@ while running:
     else:
         currentTimer = normalfont.render(str(timer), 1, (169, 169, 169))
     
+    # movement
     for event in pygame.event.get():
         if event.type == pygame.QUIT:                                    
             running = False
@@ -176,6 +192,7 @@ while running:
 
     clock.tick(60)
     
+    # screen blitting
     screen.blit(title, (200, 200))
     screen.blit(caption, (300, 312))
     screen.blit(joke, (850, 300))
